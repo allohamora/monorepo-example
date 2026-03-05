@@ -1,0 +1,20 @@
+{
+  "name": "@example/root",
+  "description": "a monorepo example",
+  "private": true,
+  "author": "https://github.com/allohamora",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "libs/*",
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allohamora/monorepo-example.git"
+  },
+  "bugs": {
+    "url": "https://github.com/allohamora/monorepo-example/issues"
+  },
+  "homepage": "https://github.com/allohamora/monorepo-example#readme"
+}
