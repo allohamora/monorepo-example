@@ -39,7 +39,7 @@ export default function configurePlop(plop: NodePlopAPI): void {
       async () => {
         await $`npm install`;
 
-        return 'Ran npm install';
+        return 'npm install';
       },
     ],
   });
