@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "generate:package": "plop --plopfile=plopfile.ts package",
+    "generate:package": "plop package",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
