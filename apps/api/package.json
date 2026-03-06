@@ -10,7 +10,7 @@
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
     "lint:fix": "eslint \"**/*.ts\" --fix",
-    "typecheck": "tsc"
+    "typecheck": "tsc --noEmit"
   },
   "imports": {
     "#src/*.ts": "./src/*.ts"
