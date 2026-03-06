@@ -44,3 +44,6 @@ jobs:
 
       - name: Run typecheck
         run: npx turbo run typecheck --affected
+
+      - name: Run tests
+        run: npx turbo run test --affected

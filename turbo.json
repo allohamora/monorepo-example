@@ -1,6 +1,9 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
+    "test": {
+      "cache": false
+    },
     "lint": {
       "cache": false
     },
