@@ -13,11 +13,9 @@
     "noImplicitOverride": true,
     "erasableSyntaxOnly": true,
     "allowImportingTsExtensions": true,
-		"rewriteRelativeImportExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "module": "NodeNext",
     "noEmit": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"]
   }
 }
