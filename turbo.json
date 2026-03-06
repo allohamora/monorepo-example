@@ -15,6 +15,26 @@
     },
     "typecheck": {
       "cache": false
+    },
+    "//#lint": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
+    },
+    "//#lint:fix": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
+    },
+    "//#format": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
+    },
+    "//#format:fix": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
+    },
+    "//#typecheck": {
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
     }
   }
 }
