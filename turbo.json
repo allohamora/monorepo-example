@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "lint": {
+      "cache": false
+    },
+    "lint:fix": {
+      "cache": false
+    },
+    "format": {
+      "cache": false
+    },
+    "format:fix": {
+      "cache": false
+    },
+    "typecheck": {
+      "cache": false
+    }
+  }
+}
