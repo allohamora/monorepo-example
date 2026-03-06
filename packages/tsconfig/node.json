@@ -1,4 +1,6 @@
 {
+  "$schema": "https://www.schemastore.org/tsconfig",
+  "display": "node",
   "compilerOptions": {
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,5 +19,6 @@
     "module": "NodeNext",
     "noEmit": true,
     "lib": ["ESNext"]
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

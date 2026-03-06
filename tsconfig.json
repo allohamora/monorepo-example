@@ -1,3 +1,4 @@
 {
-  "extends": "@example/tsconfig/node.json"
+  "extends": "@example/tsconfig/node.json",
+  "exclude": ["apps", "libs", "packages"]
 }
