@@ -9,6 +9,7 @@
     "generate:package": "plop --plopfile=plopfile.ts package"
   },
   "devDependencies": {
+    "@example/tsconfig": "*",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
     "@types/node": "^24.12.0",

@@ -1,0 +1,19 @@
+{
+  "name": "@example/tsconfig",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier . --check",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@example/prettier-config": "*",
+    "@types/node": "^24.12.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
+  },
+  "prettier": "@example/prettier-config",
+  "lint-staged": {
+    "*.{js,cjs,mjs,json,yml,md}": "prettier --write"
+  }
+}
