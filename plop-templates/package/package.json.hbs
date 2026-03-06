@@ -1,0 +1,17 @@
+{
+  "name": "@example/{{name}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier . --check",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@example/prettier-config": "*",
+    "prettier": "^3.8.1"
+  },
+  "prettier": "@example/prettier-config",
+  "lint-staged": {
+    "*.{js,cjs,mjs,json,yml,md}": "prettier --write"
+  }
+}
