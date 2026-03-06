@@ -2,7 +2,6 @@
 import globals from 'globals';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import beautifulSort from 'eslint-plugin-beautiful-sort';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import { defineConfig } from 'eslint/config';
 
@@ -14,9 +13,6 @@ export default defineConfig(
   {
     files: ['**/*.ts'],
     languageOptions: { globals: { ...globals.node }, parserOptions: { project: true } },
-    plugins: {
-      'beautiful-sort': beautifulSort,
-    },
     rules: {
       'object-shorthand': 'warn',
       'no-async-promise-executor': 'warn',
@@ -26,13 +22,6 @@ export default defineConfig(
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-misused-promises': 'warn',
       '@typescript-eslint/no-deprecated': 'error',
-      'beautiful-sort/import': [
-        'error',
-        {
-          special: ['./mocks/index.js', '/config.service.mock.js$/', '/setup-.+-context.js$/'],
-          order: ['special', 'namespace', 'default', 'defaultObj', 'obj', 'none'],
-        },
-      ],
     },
   },
 );
