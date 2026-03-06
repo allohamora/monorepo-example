@@ -25,7 +25,10 @@
   "prettier": "@example/prettier-config",
   "lint-staged": {
     "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
-    "*.ts": "eslint --fix"
+    "*.ts": [
+      "eslint --fix",
+      "tsc --noEmit"
+    ]
   },
   "engines": {
     "node": ">=v24.13.0",

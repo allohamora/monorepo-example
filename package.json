@@ -41,7 +41,10 @@
   "packageManager": "npm@11.11.0",
   "lint-staged": {
     "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
-    "*.ts": "eslint --fix"
+    "*.ts": [
+      "eslint --fix",
+      "tsc --noEmit"
+    ]
   },
   "license": "MIT",
   "repository": {
