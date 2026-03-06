@@ -1,0 +1,25 @@
+{
+  "name": "@example/eslint-config",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "private": true,
+  "scripts": {
+    "format": "prettier . --check",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@example/prettier-config": "*",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-beautiful-sort": "^3.0.1",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.56.1"
+  },
+  "prettier": "@example/prettier-config",
+  "lint-staged": {
+    "*.mjs": "prettier --write"
+  }
+}
