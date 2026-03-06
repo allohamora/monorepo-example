@@ -6,19 +6,28 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "generate:package": "plop --plopfile=plopfile.ts package"
+    "generate:package": "plop --plopfile=plopfile.ts package",
+    "format": "prettier . --check",
+    "format:fix": "prettier --write .",
+    "lint": "eslint \"**/*.ts\"",
+    "lint:fix": "eslint \"**/*.ts\" --fix"
   },
   "devDependencies": {
-    "@example/tsconfig": "*",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
+    "@example/eslint-config": "*",
+    "@example/prettier-config": "*",
+    "@example/tsconfig": "*",
     "@types/node": "^24.12.0",
+    "eslint": "^10.0.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.2",
     "plop": "^4.0.3",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "zx": "^8.8.5"
   },
+  "prettier": "@example/prettier-config",
   "workspaces": [
     "apps/*",
     "libs/*",
@@ -29,6 +38,10 @@
     "npm": ">=11.11.0"
   },
   "packageManager": "npm@11.11.0",
+  "lint-staged": {
+    "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+    "*.ts": "eslint --fix"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
