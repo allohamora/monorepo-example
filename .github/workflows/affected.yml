@@ -1,4 +1,4 @@
-name: Affected CI
+name: affected
 
 on:
   workflow_dispatch:
