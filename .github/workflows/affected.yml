@@ -1,0 +1,41 @@
+name: Affected CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  push:
+    branches:
+      - master
+
+jobs:
+  affected:
+    name: affected
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.13.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run format
+        run: npx turbo run format --affected
+
+      - name: Run lint
+        run: npx turbo run lint --affected
+
+      - name: Run typecheck
+        run: npx turbo run typecheck --affected
