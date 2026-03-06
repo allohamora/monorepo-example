@@ -1,14 +1,22 @@
 {
   "name": "@example/root",
   "description": "a monorepo example",
+  "author": "https://github.com/allohamora", 
   "private": true,
-  "author": "https://github.com/allohamora",
-  "license": "MIT",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
+    "husky": "^9.1.7"
+  },
   "workspaces": [
     "apps/*",
     "libs/*",
     "packages/*"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/allohamora/monorepo-example.git"
