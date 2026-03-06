@@ -33,7 +33,6 @@ export default defineConfig(
           order: ['special', 'namespace', 'default', 'defaultObj', 'obj', 'none'],
         },
       ],
-      'no-relative-import-paths/no-relative-import-paths': ['error', { allowSameFolder: true, allowedDepth: 1 }],
     },
   },
 );
