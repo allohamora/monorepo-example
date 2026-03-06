@@ -24,6 +24,11 @@
     "libs/*",
     "packages/*"
   ],
+  "engines": {
+    "node": ">=v24.13.0",
+    "npm": ">=11.11.0"
+  },
+  "packageManager": "npm@11.11.0",
   "license": "MIT",
   "repository": {
     "type": "git",
