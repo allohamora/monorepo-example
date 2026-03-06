@@ -10,7 +10,8 @@
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
-    "lint:fix": "eslint \"**/*.ts\" --fix"
+    "lint:fix": "eslint \"**/*.ts\" --fix",
+    "typecheck": "tsc"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",
