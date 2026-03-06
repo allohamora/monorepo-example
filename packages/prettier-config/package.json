@@ -1,0 +1,14 @@
+{
+  "name": "@example/prettier-config",
+  "type": "module",
+  "main": "./src/index.json",
+  "private": true,
+  "scripts": {
+    "format": "prettier . --check",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1"
+  },
+  "prettier": "@example/prettier-config"
+}
