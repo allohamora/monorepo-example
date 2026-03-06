@@ -1,0 +1,14 @@
+{
+  "name": "@example/api",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --watch --watch-preserve-output src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "typescript": "^5.9.3"
+  }
+}
