@@ -12,6 +12,7 @@ describe('app', () => {
 
       assert.equal(response.status, 200);
       assert.equal(await response.text(), 'pong');
+      assert.equal(response.headers.get('access-control-allow-origin'), '*');
     });
   });
 });
