@@ -34,7 +34,7 @@
   },
   "prettier": "@example/prettier-config",
   "lint-staged": {
-    "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+    "*.{js,cjs,mjs,json,yml,md,html}": "prettier --write",
     "*.{ts,tsx}": "eslint --fix"
   },
   "engines": {
