@@ -1,0 +1,35 @@
+{
+  "name": "@example/shared",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --watch --watch-preserve-output src/index.ts",
+    "format": "prettier . --check",
+    "format:fix": "prettier --write .",
+    "lint": "eslint \"**/*.ts\"",
+    "lint:fix": "eslint \"**/*.ts\" --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "imports": {
+    "#src/*.ts": "./src/*.ts"
+  },
+  "devDependencies": {
+    "@example/eslint-config": "*",
+    "@example/prettier-config": "*",
+    "@example/tsconfig": "*",
+    "@types/node": "^24.12.0",
+    "typescript": "^5.9.3"
+  },
+  "prettier": "@example/prettier-config",
+  "lint-staged": {
+    "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+    "*.ts": "eslint --fix"
+  },
+  "engines": {
+    "node": ">=v24.13.0",
+    "npm": ">=11.6.2"
+  },
+  "packageManager": "npm@11.6.2"
+}
