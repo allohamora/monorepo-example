@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { after, describe, it, mock } from 'node:test';
+import { afterEach, describe, it, mock } from 'node:test';
 import { getCurrentDate } from '#src/date.ts';
 
 describe('date', () => {
   describe('getCurrentDate', () => {
-    after(() => {
+    afterEach(() => {
       mock.timers.reset();
     });
 
