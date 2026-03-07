@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getDateLabel } from './app.tsx';
+import { getDateLabel } from '../src/app.tsx';
 
 describe('app', () => {
   describe('getDateLabel', () => {
