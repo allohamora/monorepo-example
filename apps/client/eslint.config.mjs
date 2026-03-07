@@ -14,5 +14,8 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { project: ['./tsconfig.app.json', './tsconfig.node.json'], tsconfigRootDir: import.meta.dirname },
     },
+    rules: {
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ]);

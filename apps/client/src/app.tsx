@@ -3,8 +3,9 @@ import { getCurrentDate } from '@example/shared';
 import { api } from './api.ts';
 import styles from './app.module.css';
 
+export const getDateLabel = () => `today: ${getCurrentDate()}`;
+
 export const App = () => {
-  const currentDate = getCurrentDate();
   const [{ error, loading, value }, ping] = useAsyncFn(async () => {
     const response = await api.ping.$get();
 
@@ -30,7 +31,7 @@ export const App = () => {
           {error ? error.message : (value ?? 'No response yet.')}
         </output>
 
-        <p className={styles.dateLabel}>today: {currentDate}</p>
+        <p className={styles.dateLabel}>{getDateLabel()}</p>
       </section>
     </main>
   );
