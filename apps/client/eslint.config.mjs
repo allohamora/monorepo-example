@@ -1,8 +1,8 @@
-import eslintConfig from '@example/eslint-config'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig } from 'eslint/config'
+import eslintConfig from '@example/eslint-config';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
   ...eslintConfig.base,
@@ -15,4 +15,4 @@ export default defineConfig([
       parserOptions: { project: ['./tsconfig.app.json', './tsconfig.node.json'], tsconfigRootDir: import.meta.dirname },
     },
   },
-])
+]);
