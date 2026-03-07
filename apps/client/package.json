@@ -32,5 +32,9 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   },
-  "prettier": "@example/prettier-config"
+  "prettier": "@example/prettier-config",
+  "lint-staged": {
+    "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+    "*.{ts,tsx}": "eslint --fix"
+  }
 }
