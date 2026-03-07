@@ -5,8 +5,7 @@
   padding: 24px;
   background:
     linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), #000 calc(100% - 1px)),
-    linear-gradient(transparent 0, transparent calc(100% - 1px), #000 calc(100% - 1px)),
-    #f1efe8;
+    linear-gradient(transparent 0, transparent calc(100% - 1px), #000 calc(100% - 1px)), #f1efe8;
   background-size: 24px 24px;
   color: #111;
 }
