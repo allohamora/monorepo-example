@@ -1,16 +1,11 @@
 {
-  "name": "@example/api",
+  "name": "@example/shared",
   "private": true,
   "type": "module",
   "main": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./app": "./src/app.ts"
-  },
   "scripts": {
     "start": "node src/index.ts",
     "dev": "node --watch --watch-preserve-output src/index.ts",
-    "test": "node --test \"__tests__/**/*.spec.ts\"",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
@@ -19,11 +14,6 @@
   },
   "imports": {
     "#src/*.ts": "./src/*.ts"
-  },
-  "dependencies": {
-    "@example/shared": "*",
-    "@hono/node-server": "^1.19.11",
-    "hono": "^4.12.5"
   },
   "devDependencies": {
     "@example/eslint-config": "*",
