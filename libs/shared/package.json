@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.ts",
     "dev": "node --watch --watch-preserve-output src/index.ts",
+    "test": "node --test \"__tests__/**/*.spec.ts\"",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
