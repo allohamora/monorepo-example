@@ -1,9 +1,9 @@
-import { afterAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getDateLabel } from './app.tsx';
 
 describe('app', () => {
   describe('getDateLabel', () => {
-    afterAll(() => {
+    afterEach(() => {
       vi.useRealTimers();
     });
 
