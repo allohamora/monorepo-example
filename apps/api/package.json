@@ -21,6 +21,7 @@
     "#src/*.ts": "./src/*.ts"
   },
   "dependencies": {
+    "@example/shared": "*",
     "@hono/node-server": "^1.19.11",
     "hono": "^4.12.5"
   },
