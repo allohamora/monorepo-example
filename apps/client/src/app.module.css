@@ -1,0 +1,113 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), #000 calc(100% - 1px)),
+    linear-gradient(transparent 0, transparent calc(100% - 1px), #000 calc(100% - 1px)),
+    #f1efe8;
+  background-size: 24px 24px;
+  color: #111;
+}
+
+.panel {
+  width: min(100%, 420px);
+  padding: 32px;
+  border: 3px solid #111;
+  background: #fffdf8;
+  box-shadow: 12px 12px 0 #111;
+}
+
+.kicker {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.description {
+  margin: 16px 0 0;
+  max-width: 24ch;
+  font-size: 0.95rem;
+}
+
+.button {
+  margin-top: 28px;
+  border: 3px solid #111;
+  padding: 14px 20px;
+  width: 100%;
+  background: #ff5f2e;
+  color: #111;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 6px 6px 0 #111;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background: #ffd84d;
+}
+
+.button:active:not(:disabled) {
+  transform: translate(6px, 6px);
+  box-shadow: 0 0 0 #111;
+}
+
+.button:focus-visible {
+  outline: 3px solid #111;
+  outline-offset: 4px;
+}
+
+.button:disabled {
+  cursor: progress;
+}
+
+.output {
+  display: block;
+  margin-top: 20px;
+  min-height: 3.5rem;
+  border: 3px solid #111;
+  padding: 12px 14px;
+  background: #f6f1e7;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.output[data-state='success'] {
+  background: #d5ffb8;
+}
+
+.output[data-state='error'] {
+  background: #ffd5cf;
+}
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 24px;
+    box-shadow: 8px 8px 0 #111;
+  }
+
+  .button {
+    box-shadow: 4px 4px 0 #111;
+  }
+
+  .button:active:not(:disabled) {
+    transform: translate(4px, 4px);
+  }
+}

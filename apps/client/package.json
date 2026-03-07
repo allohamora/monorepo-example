@@ -14,8 +14,11 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@example/api": "*",
+    "hono": "^4.12.5",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "react-use": "^17.6.0"
   },
   "devDependencies": {
     "@example/eslint-config": "*",
