@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
-    "lint": "eslint \"**/*.ts\"",
-    "lint:fix": "eslint \"**/*.ts\" --fix",
+    "lint": "eslint \"**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"**/*.{ts,tsx}\" --fix",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
