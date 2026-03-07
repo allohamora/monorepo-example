@@ -1,4 +1,4 @@
-# AGENTS.md
+# monorepo-example
 
 ## Overview
 
