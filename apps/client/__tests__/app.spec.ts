@@ -9,9 +9,9 @@ describe('app', () => {
 
     it('returns the current date label', () => {
       vi.useFakeTimers();
-      vi.setSystemTime(new Date('2026-03-07T18:45:30.000Z'));
+      vi.setSystemTime(new Date('2026-03-08T18:45:30.000Z'));
 
-      expect(getDateLabel()).toBe('today: 2026-03-07');
+      expect(getDateLabel()).toBe('today: 2026-03-08');
     });
   });
 });
