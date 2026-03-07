@@ -36,5 +36,10 @@
   "lint-staged": {
     "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
     "*.{ts,tsx}": "eslint --fix"
-  }
+  },
+  "engines": {
+    "node": ">=v24.13.0",
+    "npm": ">=11.6.2"
+  },
+  "packageManager": "npm@11.6.2"
 }
