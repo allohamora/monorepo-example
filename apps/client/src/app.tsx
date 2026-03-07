@@ -20,7 +20,7 @@ export const App = () => {
         <h1 className={styles.title}>Ping</h1>
         <p className={styles.description}>A single-action health check with a minimal brutalist shell.</p>
 
-        <button className={styles.button} onClick={ping} type="button">
+        <button className={styles.button} disabled={loading} onClick={ping} type="button">
           {loading ? 'Pinging...' : 'Ping server'}
         </button>
 
