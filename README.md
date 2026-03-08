@@ -15,6 +15,7 @@ An example npm workspace monorepo built on Turborepo with a focus on developer e
 - Custom PR tags like `shared`, `api`, and `client` for better understanding of affected packages by the PR author.
 - Monorepo code generation based on Plop, shown in the root `"generate:package"` script and [`plopfile.ts`](/Users/allohamora/projects/monorepo-example/plopfile.ts).
 - Running agents from the repo root, so tools like Claude Code keep their `.claude` state and permissions in one place instead of splitting them across workspaces.
+- Package-local `AGENTS.md` / `CLAUDE.md` files act like skill-like local instructions for agents that automatically discover them when working in a directory or reading files under it.
 
 ## Repository Structure
 
