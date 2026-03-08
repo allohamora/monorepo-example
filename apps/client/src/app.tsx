@@ -1,7 +1,7 @@
+import styles from './app.module.css';
 import { useAsyncFn } from 'react-use';
 import { getCurrentDate } from '@example/shared';
 import { api } from './api.ts';
-import styles from './app.module.css';
 
 export const getDateLabel = () => `today: ${getCurrentDate()}`;
 

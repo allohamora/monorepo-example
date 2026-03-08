@@ -3,12 +3,14 @@ import globals from 'globals';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import beautifulSort from 'eslint-plugin-beautiful-sort';
 import { defineConfig } from 'eslint/config';
 
 const base = defineConfig(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
+  beautifulSort.configs.recommended,
   { ignores: ['node_modules', 'dist'] },
   {
     files: ['**/*.{ts,tsx}'],
