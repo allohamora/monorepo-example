@@ -1,12 +1,21 @@
 # monorepo-example
 
-## Overview
+An example npm workspace monorepo built on Turborepo. The current setup is intentionally small, but it is organized the same way a larger multi-app repository would be.
 
-This repository is an example project that demonstrates a practical npm monorepo built on Turborepo:
+## Repository Structure
 
-- `apps/` contains runnable applications such as SPAs, APIs, servers, or other client-facing surfaces.
-- `libs/` contains shared runtime libraries used by multiple apps.
-- `packages/` contains shared configuration, tooling, and other reusable setup that is not an app and not a runtime library.
+- `apps/`: runnable products and entrypoints such as SPAs, APIs, servers, or future clients
+- `libs/`: shared runtime code used across apps instead of duplicating the same logic
+- `packages/`: shared tooling, configuration, and setup that is not runtime application code
+
+## What's Inside
+
+- `apps/api`: a Hono API running on Node
+- `apps/client`: a Vite React SPA
+- `libs/shared`: shared runtime utilities used across apps
+- `packages/eslint-config`: shared ESLint config
+- `packages/prettier-config`: shared Prettier config
+- `packages/tsconfig`: shared TypeScript config
 
 ## Instructions
 
