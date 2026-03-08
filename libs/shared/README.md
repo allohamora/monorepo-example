@@ -1,4 +1,4 @@
-# `shared`
+# `@example/shared`
 
 Shared runtime utilities for the monorepo starter.
 
