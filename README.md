@@ -17,6 +17,10 @@ An example npm workspace monorepo built on Turborepo with a focus on developer e
 - Running agents from the repo root, so tools like Claude Code keep their `.claude` state and permissions in one place instead of splitting them across workspaces.
 - Package-local `AGENTS.md` / `CLAUDE.md` files act like skill-like local instructions for agents that automatically discover them when working in a directory or reading files under it.
 
+## Release Versioning
+
+This monorepo uses a single-version, lockstep versioning strategy. The root package and every workspace package share the same version, and each release bumps all package versions together even if only one part of the repo changed.
+
 ## Repository Structure
 
 - `apps/`: runnable products and entrypoints such as SPAs, APIs, servers, or future clients
