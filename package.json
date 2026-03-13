@@ -8,6 +8,7 @@
   "scripts": {
     "prepare": "husky",
     "generate:package": "plop package",
+    "release": "node scripts/release.ts",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
     "lint": "eslint \"**/*.ts\"",
