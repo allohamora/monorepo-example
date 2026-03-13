@@ -18,6 +18,22 @@ const setPackageJsonVersion = async (version: string) => {
   await $`npm version ${version} --workspaces --commit-hooks false --git-tag-version false`;
 };
 
+const generateChangelog = async () => {
+  await $`npm run update:changelog`;
+};
+
+const commit = async (version: string) => {
+  await $`git add .`;
+  await $`git commit -m "chore: release ${version}"`;
+};
+
+const createTag = async (version: string) => {
+  await $`git tag ${version}`;
+};
+
 const version = await getVersion();
-// other actions like create release branch, create tag, bump version in .env, make a changelog
+// other actions like create release branch, bump version in .env, make a changelog
 await setPackageJsonVersion(version);
+await generateChangelog();
+await commit(version);
+await createTag(version);

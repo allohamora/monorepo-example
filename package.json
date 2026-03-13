@@ -8,6 +8,7 @@
   "scripts": {
     "prepare": "husky",
     "generate:package": "plop package",
+    "update:changelog": "conventional-changelog -p conventionalcommits",
     "release": "node scripts/release.ts",
     "format": "prettier . --check",
     "format:fix": "prettier --write .",
@@ -22,6 +23,8 @@
     "@example/prettier-config": "*",
     "@example/tsconfig": "*",
     "@types/node": "^24.12.0",
+    "conventional-changelog": "^7.2.0",
+    "conventional-changelog-conventionalcommits": "^9.3.0",
     "eslint": "^10.0.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.2",
