@@ -163,6 +163,8 @@ I apply the same thinking to commit hygiene. Husky and `lint-staged` run fixes b
 
 Conventional commits help for the same reason. In a monorepo, scope is especially useful. A commit like `feat(api):` or `fix(client):` tells me which part of the system changed before I open the diff, while a plain `feat:` usually means the change affects several apps or the repository as a whole. It also helps when I need to generate a changelog. In this repo, `update:changelog` and the release flow in `scripts/release.ts` both benefit from predictable commit types and scopes. It is a small convention, but it pays off over time.
 
+I find custom PR tags such as `shared`, `api`, or `client` useful because they let me filter PRs and understand what was affected before I even read the files.
+
 I also keep versioning simple. This repository uses one lockstep version across the root package and all workspaces. I do not treat the apps, libraries, and config packages here as independent public products, so separate version streams would mostly create bookkeeping. One repo, one product, one version line feels much simpler to me.
 
 ## Where Turborepo earns its place
