@@ -123,7 +123,7 @@ The TypeScript configuration is intentionally aligned with that model:
 }
 ```
 
-For me, this is where the monorepo stops feeling special. Node can run an API entry file that imports buildless internal packages without extra glue. Vite can do the same during frontend development, and the usual watch and test workflows still work against that same source-first setup. I do not need a separate monorepo-specific development mode layered on top of normal development.
+For me, this is where the monorepo stops feeling special. Node can run an API entry file that imports buildless internal packages without extra glue. Vite and Vitest can do the same during frontend development, so I do not need a separate monorepo-specific development mode layered on top of normal development.
 
 There is also a full-stack benefit here. The Hono pattern in this repository is very direct:
 
