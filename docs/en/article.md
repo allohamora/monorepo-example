@@ -54,7 +54,7 @@ packages/
 
 `apps/` contains runnable applications. `libs/` contains shared runtime code. `packages/` contains tooling and shared configuration. This is not a revolutionary structure, but that is exactly why I like it. It scales well, it is easy to scan, and it keeps runtime code separate from tooling concerns.
 
-At the package manager level, I keep the foundation just as boring. npm workspaces already give me what I need here: workspace dependency resolution, symlinked internal packages through `node_modules`, and root-level script execution.
+At the package manager level, I keep the foundation just as simple. npm workspaces already give me what I need here: workspace dependency resolution, symlinked internal packages through `node_modules`, and root-level script execution.
 
 ```json
 {
