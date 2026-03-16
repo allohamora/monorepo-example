@@ -1,4 +1,4 @@
-# How I Keep a TypeScript Full-Stack Monorepo Convenient
+# How I make a convenient TypeScript Full-Stack Monorepo
 
 My name is Herman. Over the years I have seen many teams start a full-stack monorepo by following the docs until it technically works, then spend the rest of the project smoothing rough edges with extra scripts, hacks, and workaround layers. After enough of that, the conclusion is often simple: monorepos are not worth it.
 
