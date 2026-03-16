@@ -157,11 +157,68 @@ Prettier is the simplest case: each workspace adds `@example/prettier-config` an
 
 ESLint is a little more layered, but still straightforward. I usually want a shared ESLint package to expose a few obvious building blocks such as `base`, `node`, or `client`, and then let each workspace keep a small local `eslint.config.mjs`. In this repo, the API and shared library can just export `eslintConfig.node`, while the client file mostly contains the client-specific layer on top of `eslintConfig.base`, namely browser, React Hooks, and Vite rules.
 
+```js
+// packages/eslint-config/src/index.mjs
+const base = defineConfig(eslint.configs.recommended, ...tseslint.configs.recommended, eslintPluginPrettierRecommended);
+
+// apps/client/eslint.config.mjs
+export default defineConfig([...eslintConfig.base, reactHooks.configs.flat.recommended, reactRefresh.configs.vite]);
+```
+
 TypeScript follows the same pattern, but the package shape is simpler. A shared `tsconfig` package usually just keeps files like `node.json` at the package root, then each workspace extends what it needs. In this repo, the API and shared library extend `@example/tsconfig/node.json`, while the client keeps its own Vite-oriented `tsconfig` files because Vite has its own constraints.
+
+```json5
+// packages/tsconfig/node.json
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "module": "NodeNext",
+    "noEmit": true
+  }
+}
+
+// apps/api/tsconfig.json
+{
+  "extends": "@example/tsconfig/node.json"
+}
+```
 
 I apply the same thinking to commit hygiene. `Husky` and `lint-staged` run fixes before commit, and the nearest config handles the staged file, so root files can stay on root rules while apps and libraries keep their own local setup, with `apps`, `packages`, and `libs` ignored for root checks so root formatting, linting, and typechecking stay focused on root-owned files. The workflow stays strict enough to be useful without turning commits into a ceremony.
 
+```bash
+# .husky/pre-commit
+npx --no-install lint-staged
+```
+
+```json5
+// package.json
+"lint-staged": {
+  "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+  "*.ts": "eslint --fix"
+}
+
+// apps/client/package.json
+"lint-staged": {
+  "*.{js,cjs,mjs,json,yml,md,html,css}": "prettier --write",
+  "*.{ts,tsx}": "eslint --fix"
+}
+```
+
 Conventional commits help for the same reason. In a monorepo, scope is especially useful. A commit like `feat(api):` or `fix(client):` tells me which part of the system changed before I open the diff, while a plain `feat:` usually means the change affects several apps or the repository as a whole. It also helps when I need to generate a changelog. In this repo, `update:changelog` and the release flow in `scripts/release.ts` both benefit from predictable commit types and scopes. It is a small convention, covered by `commitlint` and `Husky`, but it pays off over time.
+
+```bash
+# .husky/commit-msg
+npx --no-install -- commitlint --edit "$1"
+```
+
+```json
+// .commitlintrc.json
+{
+  "extends": ["@commitlint/config-conventional"]
+}
+```
 
 I find custom PR tags such as `shared`, `api`, or `client` useful because they let me filter PRs and understand what was affected before I even read the files.
 
