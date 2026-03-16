@@ -14,7 +14,7 @@ But I often build systems where the API and the client are tightly related while
 
 It keeps the applications close enough to share contracts and runtime code, but it does not force them into one framework-specific structure. In this repository, the API is a Hono app and the client is a Vite React app. The client can import the API app type for a type-safe client, and anything that should be shared outside the server boundary can live in a separate shared library. That is a very practical balance for me.
 
-The alternative is often more expensive than it first appears. Once I split a tightly coupled system into separate repositories, I usually need private package publishing, version coordination, more CI wiring, and more cross-repo bookkeeping. In my experience, that is often more friction than a monorepo, not less.
+The alternative is often more expensive than it first appears. Once I split a tightly coupled system into separate repositories, I usually need private package publishing, version coordination, and more CI wiring. In my experience, that is often more hassle than a monorepo, not less.
 
 ## What I actually want from a full-stack monorepo
 
