@@ -174,7 +174,11 @@ ESLint is a little more layered, but still straightforward. I usually want a sha
 
 ```js
 // packages/eslint-config/src/index.mjs
-const base = defineConfig(eslint.configs.recommended, ...tseslint.configs.recommended, eslintPluginPrettierRecommended);
+export const base = defineConfig(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginPrettierRecommended,
+);
 
 // apps/client/eslint.config.mjs
 export default defineConfig([...eslintConfig.base, reactHooks.configs.flat.recommended, reactRefresh.configs.vite]);
