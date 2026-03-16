@@ -28,7 +28,7 @@ For a full-stack TypeScript system, my baseline is simple:
 - Development servers and tests that react to dependency changes naturally.
 - CI that runs checks only where changes actually matter.
 - Docker images that include only what the target app needs.
-- Git history and repo conventions that stay understandable for regular application developers, not only for people who enjoy maintaining build graphs.
+- Git history and repo conventions that stay understandable for regular application developers.
 
 This list matters because it changes how I evaluate tools. I am not looking for the most feature-rich monorepo setup. I am looking for the setup that solves these practical problems with the least extra ceremony.
 
