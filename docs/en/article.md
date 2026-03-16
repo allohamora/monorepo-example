@@ -155,6 +155,21 @@ I keep shared ESLint, Prettier, and TypeScript configs in `packages/eslint-confi
 
 Prettier is the simplest case: each workspace adds `@example/prettier-config` and points its `prettier` field at it. `.prettierignore` cannot really be shared the same way, so I keep one at the root and create it in each workspace.
 
+```json5
+// packages/prettier-config/src/index.json
+{
+  "semi": true,
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 120
+}
+
+// apps/api/package.json
+{
+  "prettier": "@example/prettier-config"
+}
+```
+
 ESLint is a little more layered, but still straightforward. I usually want a shared ESLint package to expose a few obvious building blocks such as `base`, `node`, or `client`, and then let each workspace keep a small local `eslint.config.mjs`. In this repo, the API and shared library can just export `eslintConfig.node`, while the client file mostly contains the client-specific layer on top of `eslintConfig.base`, namely browser, React Hooks, and Vite rules.
 
 ```js
