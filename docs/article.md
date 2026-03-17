@@ -70,7 +70,7 @@ I know many teams prefer `pnpm` or `yarn`, and those tools can be excellent. Thi
 
 The biggest choice in this setup is how I treat shared internal packages. A lot of monorepo discussions start from the assumption that they should be built first and then consumed as compiled output. That can be the right choice in some environments, but I do not want it by default.
 
-For internal code that lives entirely inside one repository, I prefer the approach that `turborepo` documentation calls a [just-in-time internal package](https://turborepo.dev/docs/core-concepts/internal-packages#just-in-time-packages). In practice, that means the package points directly to typescript source files, and the rest of the toolchain consumes them without a separate build step.
+For internal code that lives entirely inside one repository, I prefer the approach that `turborepo` documentation calls a [just-in-time internal package](https://turborepo.dev/docs/core-concepts/internal-packages#just-in-time-packages). In practice, the package points directly to typescript source files, and the rest of the toolchain consumes them without a separate build step.
 
 ```json
 {
@@ -92,7 +92,7 @@ If I insisted on aliases for internal packages, I would usually stop being truly
 
 After that, I would also need watch scripts for those packages. I could wire that through something like `turbo watch`, but the tradeoff would not look very attractive to me. In one version, the running dev process gets restarted more often than it needs to be. In another, I end up with a separate dependency rebuild loop running on every change while the app watcher keeps handling local files. Both versions can work, but neither one feels especially smooth.
 
-If I wanted finer control, where only monorepo dependencies get rebuilt while local changes are still handled by the application's own watcher, I would probably end up writing a custom watch script on top of something like `turbowatch`. In practice, that can easily turn into a small internal scripts package and another layer of repo-specific logic.
+If I wanted finer control, where only monorepo dependencies get rebuilt while local changes are still handled by the application's own watcher, I would probably have to go further. In practice, that usually ends with a custom watch script on top of something like `turbowatch`, a small internal scripts package, and another layer of repo-specific logic.
 
 Then the editor can become part of the problem too. After a few rebuilds, the typescript server can drift out of sync, so I either restart it manually or patch the setup with `references` without `composite` just to keep the ide aligned with the latest output.
 
@@ -104,7 +104,7 @@ I am not saying compiled internal packages are wrong. If a package needs to run 
 
 The buildless package decision works because the runtime and tooling choices support it instead of fighting it.
 
-This repository targets modern `node.js`, leans on `erasableSyntaxOnly`, and runs typescript entry files directly. The `api` package uses `node src/index.ts` for start and `node --watch src/index.ts` for development. The `shared` library is also source-first. In practice, that means I can change code in `@example/shared` and let normal tooling pick it up without a separate cycle of rebuilding the package, restarting the app, and resetting editor state.
+This repository targets modern `node.js`, leans on `erasableSyntaxOnly`, and runs typescript entry files directly. The `api` package uses `node src/index.ts` for start and `node --watch src/index.ts` for development. The `shared` library is also source-first. That means I can change code in `@example/shared`, and normal tooling picks it up without a separate cycle of rebuilding the package, restarting the app, and resetting editor state.
 
 The typescript configuration is intentionally aligned with that model:
 
@@ -226,7 +226,7 @@ npx --no-install lint-staged
 }
 ```
 
-Conventional commits help for the same reason. In a monorepo, scopes are especially useful. A commit like `feat(api):` or `fix(client):` tells me which part of the system changed before I open the diff, while a plain `feat:` usually means the change is broader. The conventional commit format is covered by `commitlint` and `husky`, and consistent scopes pay off over time, especially when I need to generate a changelog. In this repo, `update:changelog` and the release flow in `scripts/release.ts` both benefit from that consistency.
+Conventional commits help here too, and commit scopes are especially useful. With `feat(api):` or `fix(client):`, I can see which part of the system changed before opening the diff, while a plain `feat:` usually means the change touches multiple applications or the whole repository. That makes both the history easier to read and changelog generation simpler. In this repo, predictable commit scopes also help the `update:changelog` script, which is part of the release workflow in `scripts/release.ts`. It is a small convention, supported by `commitlint` and `husky`, but it pays off over time.
 
 ```bash
 # .husky/commit-msg
@@ -285,12 +285,12 @@ Once the main workflow is stable, a few smaller choices make the repository nice
 
 One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that through the root `generate:package` workflow. The same approach works anywhere the structure repeats, for example when creating a new microservice together with its `terraform` changes. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
 
-Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. At the same time, when the agent needs to work inside a nested app or library, it can load the local `AGENTS.md` or `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
+Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. When the agent needs to work inside a nested app or library, it can load the local `AGENTS.md` or `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
 
 ## Conclusion
 
 For me, a convenient typescript monorepo is not about assembling the most advanced stack. It is about removing unnecessary layers until the repository feels like normal application development again. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays in the narrow places where its graph awareness actually pays off.
 
-I am not presenting this repository as a perfect template that every team should copy. It is a demonstration of an idea and a set of tradeoffs. But if you are building a full-stack typescript system and you are tired of monorepos that feel heavier than the product itself, this is the direction I would start with.
+I am not presenting this repository as a perfect template that every team should copy. I am simply showing an idea and a set of tradeoffs. But if you are building a full-stack typescript system and you are tired of monorepos that feel heavier than the product itself, this is the direction I would start with.
 
 Repository: [https://github.com/allohamora/monorepo-example](https://github.com/allohamora/monorepo-example)
