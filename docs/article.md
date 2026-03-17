@@ -18,7 +18,7 @@ The alternative is often more expensive than it seems at first. As soon as I spl
 
 ## What I actually want from a full-stack monorepo
 
-Before I choose tools, I try to define what I actually want the repository to do for me. If I skip that step, it becomes too easy to keep adding features just because monorepo tools offer them.
+Before I choose tools, I define what I want from the monorepo, otherwise it becomes too easy to chase features instead of solving practical problems with the minimum necessary setup.
 
 For a full-stack typescript system, my baseline is fairly simple:
 
@@ -29,8 +29,6 @@ For a full-stack typescript system, my baseline is fairly simple:
 - `CI` that runs checks only where they matter.
 - `Docker` images that include only what the target application needs.
 - Git history and repository conventions that stay understandable for regular application developers.
-
-This list matters because it changes how I evaluate tools. I am not looking for the most feature-rich monorepo setup. I am looking for the setup that solves these practical problems with the least extra ceremony.
 
 ## Simple workspace boundaries
 
