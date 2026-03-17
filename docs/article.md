@@ -4,13 +4,13 @@ Hi, my name is Herman. Over the years I have seen many teams set up a full-stack
 
 I do not think the monorepo itself is usually the problem. More often, the problem is a setup that was put together quickly and never made convenient for day-to-day work. In this article, I want to show the approach I use to keep a full-stack monorepo smooth, practical, and close to normal application development.
 
-I am writing this for engineers who want one repository for `client`, `api`, and `shared` typescript code, but do not want the workflow to feel heavier every few months. I will use my own repository as the example, not as a universal template, but as a concrete demonstration of the decisions that keep a monorepo convenient for me.
+I am writing this for engineers who want one repository for `client`, `api`, and `shared` typescript code, but do not want the monorepo to make day-to-day development heavier. I will use my own repository as the example, not as a universal template, but as a concrete demonstration of decisions and tradeoffs.
 
 ## Why I choose a monorepo for full-stack work
 
 I do not think every full-stack application should live in a monorepo. If `api` and `client` fit naturally inside one framework like `astro`, or if they barely depend on each other, a monorepo may be unnecessary.
 
-But I often build systems where `api` and `client` are tightly related while still needing to stay separate applications. I may want a dedicated `api` with its own runtime model and its own deployment. I may also need `websockets` or a `job queue`, which can be awkward to implement inside some full-stack frameworks. In those cases, a monorepo becomes a good middle ground.
+But I often build systems where `api` and `client` are tightly related while still needing to stay separate applications. I may want a dedicated `api` with its own runtime and its own deployment. I may also need `websockets` or a `job queue`, which can be awkward to implement inside some full-stack frameworks. In those cases, a monorepo becomes a good middle ground.
 
 It keeps the applications close enough to share contracts and runtime code, but it does not force everything into one structure shaped by a specific framework. In this repository, `api` is a `hono` app and `client` is a `react` app built with `vite`. The `client` can import types from `api` to make type-safe requests, and anything else that should be shared can live in the `shared` library.
 
@@ -18,7 +18,7 @@ The alternative is often more expensive than it seems at first. As soon as I spl
 
 ## What I actually want from a full-stack monorepo
 
-Before I choose tools, I define what I want from the monorepo, otherwise it becomes too easy to chase features instead of solving practical problems with the minimum necessary setup.
+Before I choose tools, I define what I want from the monorepo, otherwise it becomes too easy to chase features instead of solving practical problems with minimal setup.
 
 For a full-stack typescript system, my baseline is fairly simple:
 
@@ -111,7 +111,7 @@ The typescript configuration is intentionally aligned with that model:
 }
 ```
 
-In this model, `node` can run the `api` application's typescript entrypoint, which imports internal packages without a separate build or extra stages. `Vite` and `vitest` can do the same during `client` development, so I do not need a separate monorepo development mode layered on top of normal development.
+This matters not only for `api`. `Vite` and `vitest` on the `client` side can also work with internal packages directly, so I do not need extra monorepo orchestration on top of the normal workflow.
 
 This is also where the benefit of importing types from `api` shows up:
 
@@ -134,8 +134,6 @@ console.log(await res.text());
 If I break the server contract with an incompatible change, `client` can fail during typechecking instead of letting the mismatch survive until runtime. When something cannot or should not be exported directly from the server package, I move it into the `shared` library. That keeps the contract between applications close to the code that uses it.
 
 ## The conventions that make daily work smoother
-
-These conventions are not only about runtime mechanics. They also make daily work smoother by reducing the number of decisions engineers have to make every day.
 
 I keep shared `eslint`, `prettier`, and `typescript` configs in `packages/eslint-config`, `packages/prettier-config`, and `packages/tsconfig`, and I treat them like ordinary workspace packages.
 
@@ -277,7 +275,7 @@ Another is how I work with `ai` agents in the repository. In a monorepo, I prefe
 
 ## Conclusion
 
-For me, a convenient typescript monorepo is not about assembling the most advanced stack. It is about removing unnecessary layers until the repository feels like normal application development again. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays in the narrow places where its graph awareness actually pays off.
+Overall, this approach relies on a few simple decisions that fit together well. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays only where its graph awareness actually pays off.
 
 I am not presenting this repository as a perfect template that every team should copy. I am simply showing an idea and a set of tradeoffs. But if you are building a full-stack typescript system and you are tired of monorepos that feel heavier than the product itself, this is the direction I would start with.
 
