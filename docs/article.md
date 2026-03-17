@@ -64,7 +64,7 @@ At the package manager level, I keep the foundation just as simple. `npm` worksp
 }
 ```
 
-I know many teams prefer `pnpm` or `yarn`, and those tools can be excellent. This is not an argument that `npm` is universally better. It is simply my conclusion that for this repository, `npm` is already enough.
+I know many teams prefer `pnpm` or `yarn`, and those are excellent tools, but for my requirements `npm` is enough and there is no reason to add another tool to the stack without a real need.
 
 ## Buildless typescript internal packages
 
@@ -84,21 +84,11 @@ For internal code that lives entirely inside one repository, I prefer the approa
 }
 ```
 
-This one decision removes a surprising amount of infrastructure code. I do not need a parallel watch process rebuilding the shared package. I do not need to worry about stale `dist/` output. I do not need to teach every tool how to follow build artifacts that exist only because the repo is a monorepo.
+This one decision removes a surprising amount of infrastructure code that usually appears in a monorepo. At the same time, it forbids typescript aliases, because aliases already require a build step.
 
-It also changes how I think about aliases. In this setup, I do not want typescript `paths` to be the main way internal packages are consumed. They can be fine in some application-level cases, but they are not the foundation I want for buildless internal packages.
+If I wanted aliases for internal packages, I would have to add a build into `dist/`, then do a post-build rewrite with something like `tsc-alias`, and also keep separate watch support for rebuilds. With `turbo watch`, that would mean either unnecessary restarts of the dev process or a parallel loop rebuilding dependencies on every change. If I needed finer behavior, where only monorepo dependencies get rebuilt while local changes are still handled by the application's own watcher, I would have to go further. In practice, that usually ends with a custom watch script on top of something like `turbowatch` and even a separate internal scripts package.
 
-If I insisted on aliases for internal packages, I would usually stop being truly buildless. I would need compiled output in `dist/`, package entrypoints pointing at that output, a typescript build step, and usually a post-build rewrite with something like `tsc-alias` so the compiled imports still resolve correctly.
-
-After that, I would also need watch scripts for those packages. I could wire that through something like `turbo watch`, but the tradeoff would not look very attractive to me. In one version, the running dev process gets restarted more often than it needs to be. In another, I end up with a separate dependency rebuild loop running on every change while the app watcher keeps handling local files. Both versions can work, but neither one feels especially smooth.
-
-If I wanted finer control, where only monorepo dependencies get rebuilt while local changes are still handled by the application's own watcher, I would probably have to go further. In practice, that usually ends with a custom watch script on top of something like `turbowatch`, a small internal scripts package, and another layer of repo-specific logic.
-
-Then the editor can become part of the problem too. After a few rebuilds, the typescript server can drift out of sync, so I either restart it manually or patch the setup with `references` without `composite` just to keep the ide aligned with the latest output.
-
-That setup can be made to work, and for some repositories it may be the right tradeoff. I just do not want to choose that stack before I need it, especially when a buildless package plus node's `imports` already gives me a simpler path.
-
-I am not saying compiled internal packages are wrong. If a package needs to run in an environment that cannot consume source directly, if it needs to be published outside the repo, or if the toolchain truly requires compiled output, then a build step is reasonable. My point is narrower: I do not want to pay that cost before I have a real reason.
+The problem often does not stop at runtime. After a few rebuilds, the typescript server in the editor can stop syncing correctly, so I either restart it manually or patch the setup with `references` without `composite` to keep the ide aligned with the current state. That tradeoff can be justified if the package needs to be published or the toolchain truly requires compiled output, but without a real need I would not do it.
 
 ## Why development stays smooth
 
@@ -123,7 +113,7 @@ The typescript configuration is intentionally aligned with that model:
 }
 ```
 
-For me, this is where the monorepo stops feeling special. `node` can run an `api` entry file that imports buildless internal packages without extra glue. `vite` and `vitest` can do the same during `client` development, so I do not need a separate monorepo-specific development mode layered on top of normal development.
+In this model, `node` can run the `api` application's typescript entrypoint, which imports internal packages without a separate build or extra stages. `Vite` and `vitest` can do the same during `client` development, so I do not need a separate monorepo development mode layered on top of normal development.
 
 This is also where the benefit of importing types from `api` shows up:
 
@@ -242,13 +232,13 @@ npx --no-install -- commitlint --edit "$1"
 
 I also find custom pull request labels like `shared`, `api`, or `client` useful, because they make it easier to scan and filter pull requests before I read the files.
 
-I also keep versioning simple. This repository uses one lockstep version across the root package and all workspaces. I do not treat the apps, libraries, and config packages here as separate public products, so separate version streams would mostly add extra work.
+I also simplify the versioning scheme on purpose. This repository uses one version for the root package and all workspaces. There is no need for separate versions for each package here and, accordingly, no need for a more complicated version update process.
 
 ## Where turborepo earns its place
 
-`turborepo` is not the center of this setup, but it is useful in the places where monorepo-specific logic actually matters. I do not want it wrapping every workflow by default. I use it when I need graph awareness, cache awareness, or pruning, and I leave it out when a normal script is enough.
+In this setup, `turborepo` is not mandatory, but in some places it is really useful.
 
-The clearest example is affected checks in `ci`. I want the repository to understand package relationships and run checks only where a change actually matters, and `turborepo` already handles that well enough that I do not see a reason to replace it with custom scripts to walk the dependency graph.
+The clearest example is affected `ci`. I want the repository to understand relationships between packages and run checks only where a change actually matters, and `turborepo` already does that well enough.
 
 ```yaml
 # .github/workflows/affected.yml
@@ -277,15 +267,15 @@ In this repository, I set `TURBO_SCM_BASE` explicitly in `github actions` to hel
 
 `Docker` is the other obvious example. `turbo prune` lets me build an image from only the code and dependencies the target application needs instead of pulling the whole repository into the build context. In this repo, the `Dockerfile` for `api` uses `turbo prune --scope=@example/api --docker` for exactly that reason. That is real value, not abstraction for its own sake.
 
-This is also why I do not use `nx` here. I think it works well when a repository stays inside its model, but that comes with more abstraction and more magic. For this repo, I would rather stay closer to standard tools until I have a concrete reason to do otherwise.
+This is also why I do not use `nx` here. I think it works well when a repository stays inside its model, but that comes with more abstraction and more magic.
 
 ## The extra quality-of-life pieces
 
 Once the main workflow is stable, a few smaller choices make the repository nicer to live in.
 
-One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that through the root `generate:package` workflow. The same approach works anywhere the structure repeats, for example when creating a new microservice together with its `terraform` changes. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
+One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that and show an example of it in the root `generate:package` script. The same approach works anywhere the structure repeats, for example when creating a new microservice together with its `terraform` changes. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
 
-Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. When the agent needs to work inside a nested app or library, it can load the local `AGENTS.md` or `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
+Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. When the agent needs to work inside a nested app or library, it can automatically load the local `AGENTS.md` / `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
 
 ## Conclusion
 
