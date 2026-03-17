@@ -26,7 +26,7 @@ For a full-stack typescript system, my baseline is fairly simple:
 - The ability to run scripts from the repository root when that is convenient, while keeping each workspace useful on its own.
 - Shared code without publishing internal packages or rebuilding them after every small change.
 - Dev scripts that react naturally to changes in dependencies.
-- `Ci` that runs checks only where they matter.
+- `CI` that runs checks only where they matter.
 - `Docker` images that include only what the target application needs.
 - Git history and repository conventions that stay understandable for regular application developers.
 
