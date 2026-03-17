@@ -275,7 +275,7 @@ Another is how I work with `ai` agents in the repository. In a monorepo, I prefe
 
 ## Conclusion
 
-Overall, this approach relies on a few simple decisions that fit together well. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays only where its graph awareness actually pays off.
+This approach relies on a few simple decisions that fit together well. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays only where its graph awareness actually pays off.
 
 I am not presenting this repository as a perfect template that every team should copy. I am simply showing an idea and a set of tradeoffs. But if you are building a full-stack typescript system and you are tired of monorepos that feel heavier than the product itself, this is the direction I would start with.
 
