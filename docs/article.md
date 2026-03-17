@@ -143,7 +143,7 @@ const res = await api.ping.$get();
 console.log(await res.text());
 ```
 
-If I break the server contract with an incompatible change, `client` can fail at typecheck time instead of letting the mismatch survive until runtime. When something cannot or should not be exported directly from the server package, I move it into the `shared` library. That keeps the contract between applications close to the code that uses it.
+If I break the server contract with an incompatible change, `client` can fail during typechecking instead of letting the mismatch survive until runtime. When something cannot or should not be exported directly from the server package, I move it into the `shared` library. That keeps the contract between applications close to the code that uses it.
 
 ## The conventions that make daily work smoother
 
@@ -171,7 +171,7 @@ I keep shared `eslint`, `prettier`, and `typescript` configs in `packages/eslint
 }
 ```
 
-`Eslint` is a little more layered, but still straightforward. I usually want the shared package to expose a few obvious building blocks such as `base` and `node`, while each workspace keeps a small local `eslint.config.mjs`. In this repo, `api` and `shared` can simply default-export `eslintConfig.node`, while `client` builds on `eslintConfig.base` with browser, react hooks, and vite-specific rules.
+`Eslint` is a little more layered, but still straightforward. I usually want the shared package to expose a few obvious building blocks such as `base` and `node`, while each workspace keeps a small local `eslint.config.mjs`. In this repo, `api` and `shared` can simply export `eslintConfig.node` as the default, while `client` builds on `eslintConfig.base` with browser, react hooks, and vite-specific rules.
 
 ```js
 // packages/eslint-config/src/index.mjs
@@ -205,7 +205,7 @@ export default defineConfig([...eslintConfig.base, reactHooks.configs.flat.recom
 }
 ```
 
-I apply the same thinking to commit hygiene. `husky` and `lint-staged` run fixes before commit, and the nearest config handles the staged files, so root files can stay on root rules while apps and libraries keep their own local setup. `apps`, `packages`, and `libs` are ignored for root checks, which keeps root formatting, linting, and typechecking focused on root-owned files.
+I apply the same thinking to commit hygiene. `husky` and `lint-staged` run fixes before commit, and the nearest config handles the staged files, so root files can stay on root rules while apps and libraries keep their own local setup. `apps`, `packages`, and `libs` are ignored for root checks, which keeps root formatting, linting, and typechecking focused on root files.
 
 ```bash
 # .husky/pre-commit
@@ -248,7 +248,7 @@ I also keep versioning simple. This repository uses one lockstep version across 
 
 `turborepo` is not the center of this setup, but it is useful in the places where monorepo-specific logic actually matters. I do not want it wrapping every workflow by default. I use it when I need graph awareness, cache awareness, or pruning, and I leave it out when a normal script is enough.
 
-The clearest example is affected checks in `ci`. I want the repository to understand package relationships and run checks only where a change actually matters, and `turborepo` already handles that well enough that I do not see a reason to replace it with custom dependency-graph scripting.
+The clearest example is affected checks in `ci`. I want the repository to understand package relationships and run checks only where a change actually matters, and `turborepo` already handles that well enough that I do not see a reason to replace it with custom scripts to walk the dependency graph.
 
 ```yaml
 # .github/workflows/affected.yml
@@ -273,7 +273,7 @@ I also need root-only tasks in `turbo.json` for checks that should react to root
 }
 ```
 
-In this repository, I set `TURBO_SCM_BASE` explicitly in `github actions` to help `turborepo` find the right comparison point when using `--affected`. Those root tasks are there so affected runs can include root-owned files, not just workspace changes.
+In this repository, I set `TURBO_SCM_BASE` explicitly in `github actions` to help `turborepo` find the right comparison point when using `--affected`. Those root tasks are there so affected runs can include root files, not just workspace changes.
 
 `Docker` is the other obvious example. `turbo prune` lets me build an image from only the code and dependencies the target application needs instead of pulling the whole repository into the build context. In this repo, the `Dockerfile` for `api` uses `turbo prune --scope=@example/api --docker` for exactly that reason. That is real value, not abstraction for its own sake.
 
@@ -285,7 +285,7 @@ Once the main workflow is stable, a few smaller choices make the repository nice
 
 One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that through the root `generate:package` workflow. The same approach works anywhere the structure repeats, for example when creating a new microservice together with its `terraform` changes. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
 
-Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. At the same time, when the agent needs to work inside a nested app or library, it can load the local `AGENTS.md` or `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, that root-run model feels much cleaner.
+Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. At the same time, when the agent needs to work inside a nested app or library, it can load the local `AGENTS.md` or `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
 
 ## Conclusion
 
