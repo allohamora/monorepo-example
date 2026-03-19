@@ -235,7 +235,7 @@ npx --no-install -- commitlint --edit "$1"
 
 I also find custom pull request labels like `shared`, `api`, or `client` useful, because they let me filter pull requests and understand what was touched before reading the files.
 
-I also simplify the versioning scheme on purpose. This repository uses one version for the root package and all workspaces. There is no need for separate versions for each package here and, accordingly, no need for a more complicated version update process.
+I also simplify the versioning scheme on purpose. This repository uses one version for the root package and all workspaces, so there is no need for separate versions for each package or a more complicated version update process, and `scripts/release.ts` shows a simple example of that release flow.
 
 ## Where turborepo earns its place
 
