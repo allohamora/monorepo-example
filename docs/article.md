@@ -191,7 +191,7 @@ Typescript follows the same pattern, but the package shape is simpler. A shared 
 }
 ```
 
-I apply the same thinking to commit hygiene. Husky and lint-staged run fixes before commit, and the nearest config handles the staged files, so root files can stay on root config while apps and libraries keep their own local setup. `apps`, `packages`, and `libs` are ignored for root checks, which keeps root formatting, linting, and typechecking focused on root files.
+I apply the same thinking to commit hygiene. Husky and lint-staged run fixes before commit, and the nearest config handles the staged files, so root files can stay on root handling while apps and libraries keep their own local setup. `apps`, `packages`, and `libs` are ignored for root checks, which keeps root formatting, linting, and typechecking focused on root files.
 
 ```bash
 # .husky/pre-commit
