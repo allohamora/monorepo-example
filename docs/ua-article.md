@@ -249,8 +249,6 @@ steps:
   - run: npx turbo run test --affected
 ```
 
-Мені також потрібні окремі задачі в `turbo.json` для перевірок, які мають реагувати на файли в root на кшталт `README.md`:
-
 ```json5
 // turbo.json
 "//#format": {

@@ -249,8 +249,6 @@ steps:
   - run: npx turbo run test --affected
 ```
 
-I also need root-only tasks in `turbo.json` for checks that should react to root files such as `README.md`:
-
 ```json5
 // turbo.json
 "//#format": {
