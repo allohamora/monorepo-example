@@ -212,7 +212,7 @@ npx --no-install lint-staged
 }
 ```
 
-Тут також допомагають conventional commits, у яких особливо корисними є commit scopes. Наприклад, з `feat(api):` або `fix(client):` я ще до відкриття diff бачу, яка саме частина системи змінилася, тоді як звичайний `feat:` зазвичай означає, що зміна зачіпає кілька застосунків або весь репозиторій. Це спрощує і читання історії, і генерацію changelog через `update:changelog` у `scripts/release.ts`. Це невелика конвенція, яку підтримують commitlint і husky, але з часом вона добре окупається.
+Тут також допомагають conventional commits, у яких особливо корисними є commit scopes. Наприклад, з `feat(api):` або `fix(client):` я ще до відкриття diff бачу, яка саме частина системи змінилася, тоді як звичайний `feat:` зазвичай означає, що зміна зачіпає кілька застосунків або весь репозиторій. Це спрощує і читання історії, і генерацію changelog через conventional-changelog. Це невелика конвенція, яку підтримують commitlint і husky, але з часом вона добре окупається.
 
 ```bash
 # .husky/commit-msg
@@ -223,6 +223,13 @@ npx --no-install -- commitlint --edit "$1"
 // .commitlintrc.json
 {
   "extends": ["@commitlint/config-conventional"]
+}
+```
+
+```json
+// package.json
+"scripts": {
+  "update:changelog": "conventional-changelog -p conventionalcommits"
 }
 ```
 
