@@ -135,9 +135,9 @@ console.log(await res.text());
 
 ## Конвенції, які роблять щоденну роботу плавнішою
 
-Я тримаю спільні конфіги для eslint, prettier і typescript у `packages/eslint-config`, `packages/prettier-config` і `packages/tsconfig` та ставлюся до них як до звичайних пакетів workspaces.
+Я тримаю спільні конфіги для `eslint`, `prettier` і `typescript` у `packages/eslint-config`, `packages/prettier-config` і `packages/tsconfig` та ставлюся до них як до звичайних пакетів workspaces.
 
-Для спільного prettier: кожен workspace додає `@example/prettier-config` і вказує на нього у своєму полі `prettier` у package.json. `.prettierignore` неможливо поділити таким самим способом, тому доводиться його дублювати у кожному workspace та в root.
+Для спільного `prettier`: кожен workspace додає `@example/prettier-config` і вказує на нього у своєму полі `prettier` у `package.json`. `.prettierignore` неможливо поділити таким самим способом, тому доводиться його дублювати у кожному workspace та в root.
 
 ```json5
 // packages/prettier-config/src/index.json
@@ -157,7 +157,7 @@ console.log(await res.text());
 }
 ```
 
-Для eslint я зазвичай хочу, щоб спільний пакет віддавав кілька очевидних базових конфігів на кшталт `base`, `node`, а кожен workspace при цьому тримав невеликий локальний `eslint.config.mjs`. У цьому репозиторії `api` і `shared` бібліотека можуть просто експортувати `eslintConfig.node`, а `client` містить `eslintConfig.base` з додатковими правилами для `react` і `vite`.
+Для `eslint` я зазвичай хочу, щоб спільний пакет віддавав кілька очевидних базових конфігів на кшталт `base`, `node`, а кожен workspace при цьому тримав невеликий локальний `eslint.config.mjs`. У цьому репозиторії `api` і `shared` бібліотека можуть просто експортувати `eslintConfig.node`, а `client` містить `eslintConfig.base` з додатковими правилами для `react` і `vite`.
 
 ```js
 // packages/eslint-config/src/index.mjs
@@ -171,7 +171,7 @@ export const base = defineConfig(
 export default defineConfig([...eslintConfig.base, reactHooks.configs.flat.recommended, reactRefresh.configs.vite]);
 ```
 
-Для typescript логіка та сама, але форма пакета простіша. Спільний `tsconfig` пакет зазвичай просто тримає файли на кшталт `node.json` у корені пакета, а потім кожен workspace розширює те, що йому потрібно. У цьому репозиторії `api` і `shared` бібліотека розширюють `@example/tsconfig/node.json`, а `client` тримає власні `tsconfig` файли, орієнтовані на `vite`, бо `vite` має свої обмеження.
+Для `typescript` логіка та сама, але форма пакета простіша. Спільний `tsconfig` пакет зазвичай просто тримає файли на кшталт `node.json` у корені пакета, а потім кожен workspace розширює те, що йому потрібно. У цьому репозиторії `api` і `shared` бібліотека розширюють `@example/tsconfig/node.json`, а `client` тримає власні `tsconfig` файли, орієнтовані на `vite`, бо `vite` має свої обмеження.
 
 ```json5
 // packages/tsconfig/node.json
@@ -259,11 +259,11 @@ steps:
 }
 ```
 
-У цьому репозиторії я явно задаю `TURBO_SCM_BASE` у github actions, щоб допомогти `turborepo` знайти правильну ціль під час використання `--affected`, а root tasks у `turbo.json` потрібні для того, щоб у такі запуски потрапляли ще й файли з root, а не лише зміни у workspaces.
+У цьому репозиторії я явно задаю `TURBO_SCM_BASE` у `github actions`, щоб допомогти `turborepo` знайти правильну ціль під час використання `--affected`, а root tasks у `turbo.json` потрібні для того, щоб у такі запуски потрапляли ще й файли з root, а не лише зміни у workspaces.
 
-Іншим очевидним прикладом є `docker`. `turbo prune` дозволяє мені будувати образ лише з коду і залежностей, які потрібні цільовому застосунку, замість того, щоб тягнути весь репозиторій у контекст збірки. У цьому репозиторії `dockerfile` для `api` використовує `turbo prune --scope=@example/api --docker` саме з цієї причини. Це реальна цінність, а не просто абстракція заради самої абстракції.
+Іншим очевидним прикладом є `docker`. `turbo prune` дозволяє мені будувати образ лише з коду і залежностей, які потрібні цільовому застосунку, замість того, щоб тягнути весь репозиторій у контекст збірки. У цьому репозиторії `Dockerfile` для `api` використовує `turbo prune --scope=@example/api --docker` саме з цієї причини. Це реальна цінність, а не просто абстракція заради самої абстракції.
 
-Саме тому я тут не використовую nx. Я вважаю, що він добре працює, коли репозиторій залишається всередині його моделі, але разом із цим приходить більше абстракції і більше магії.
+Саме тому я тут не використовую `nx`. Я вважаю, що він добре працює, коли репозиторій залишається всередині його моделі, але разом із цим приходить більше абстракції і більше магії.
 
 ## Додаткові речі, які роблять життя приємнішим
 

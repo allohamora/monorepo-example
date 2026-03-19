@@ -4,13 +4,13 @@ Hi, my name is Herman. Over the years I have seen many teams set up a full-stack
 
 I do not think the monorepo itself is usually the problem. More often, the problem is a setup that was put together quickly and never made convenient for day-to-day work. In this article, I want to show the approach I use to keep a full-stack monorepo smooth, practical, and close to normal application development.
 
-I am writing this for engineers who want one repository for `client`, `api`, and `shared` typescript code, but do not want the monorepo to make day-to-day development heavier. I will use my own repository as the example, not as a universal template, but as a concrete demonstration of decisions and tradeoffs.
+I am writing this for engineers who want one repository for `client`, `api`, and `shared` typescript code, but do not want the monorepo to complicate day-to-day development. I will use my own repository as the example, not as a universal template, but as a concrete demonstration of decisions and tradeoffs.
 
 ## Why I choose a monorepo for full-stack work
 
-I do not think every full-stack application should live in a monorepo. If `api` and `client` fit naturally inside one framework like `astro`, or if they barely depend on each other, a monorepo may be unnecessary.
+I do not think every full-stack application should live in a monorepo. If `api` and `client` can be fully implemented within one framework like `astro`, or if they barely depend on each other, a monorepo may be unnecessary.
 
-But I often build systems where `api` and `client` are tightly related while still needing to stay separate applications. I may want a dedicated `api` with its own runtime and its own deployment. I may also need `websockets` or a `job queue`, which can be awkward to implement inside some full-stack frameworks. In those cases, a monorepo becomes a good middle ground.
+But I often build systems where `api` and `client` are tightly related while still needing to stay separate applications. I may want a dedicated `api` with its own `runtime` and its own `deployment`. I may also need `websockets` or a `job queue`, which can be awkward to implement inside some full-stack frameworks. In those cases, a monorepo becomes a good middle ground.
 
 It keeps the applications close enough to share contracts and runtime code, but it does not force everything into one structure shaped by a specific framework. In this repository, `api` is a `hono` app and `client` is a `react` app built with `vite`. The `client` can import types from `api` to make type-safe requests, and anything else that should be shared can live in the `shared` library.
 
@@ -20,9 +20,9 @@ The alternative is often more expensive than it seems at first. As soon as I spl
 
 Before I choose tools, I define what I want from the monorepo, otherwise it becomes too easy to chase features instead of solving practical problems with minimal setup.
 
-For a full-stack typescript system, my baseline is fairly simple:
+For a full-stack typescript monorepo, my baseline requirements are fairly simple:
 
-- Clear boundaries between runnable applications, shared runtime code, and tooling.
+- Clear boundaries between applications, shared runtime code, and tooling.
 - The ability to run scripts from the repository root when that is convenient, while keeping each workspace useful on its own.
 - Shared code without publishing internal packages or rebuilding them after every small change.
 - Dev scripts that react naturally to changes in dependencies.
@@ -92,7 +92,7 @@ The problem often does not stop at runtime. After a few rebuilds, the typescript
 
 The buildless package decision works because the runtime and tooling choices support it instead of fighting it.
 
-This repository targets modern `node.js`, leans on `erasableSyntaxOnly`, and runs typescript entry files directly. The `api` package uses `node src/index.ts` for start and `node --watch src/index.ts` for development. The `shared` library is also source-first. That means I can change code in `@example/shared`, and normal tooling picks it up without a separate cycle of rebuilding the package, restarting the app, and resetting editor state.
+This repository targets modern `node.js` with `erasable syntax` and relies on running typescript entry files directly. The `api` package uses `node src/index.ts` for start and `node --watch src/index.ts` for development. The `shared` library also works directly with source code. That means I can change code in `@example/shared`, and normal tooling picks it up without a separate cycle of rebuilding the package, restarting the application, and updating the editor state.
 
 The typescript configuration is intentionally aligned with that model:
 
@@ -137,7 +137,7 @@ If I break the server contract with an incompatible change, `client` can fail du
 
 I keep shared `eslint`, `prettier`, and `typescript` configs in `packages/eslint-config`, `packages/prettier-config`, and `packages/tsconfig`, and I treat them like ordinary workspace packages.
 
-`Prettier` is the simplest case. Each workspace adds `@example/prettier-config` and points its `prettier` field at it. `.prettierignore` cannot really be shared the same way, so I keep one at the root and duplicate it in each workspace.
+For shared `prettier`, each workspace adds `@example/prettier-config` and points its `prettier` field to it in `package.json`. `.prettierignore` cannot be shared the same way, so it has to be duplicated in each workspace and at the root.
 
 ```json5
 // packages/prettier-config/src/index.json
@@ -157,7 +157,7 @@ I keep shared `eslint`, `prettier`, and `typescript` configs in `packages/eslint
 }
 ```
 
-`Eslint` is a little more layered, but still straightforward. I usually want the shared package to expose a few obvious building blocks such as `base` and `node`, while each workspace keeps a small local `eslint.config.mjs`. In this repo, `api` and `shared` can simply export `eslintConfig.node` as the default, while `client` builds on `eslintConfig.base` with browser, react hooks, and vite-specific rules.
+For `eslint`, I usually want the shared package to provide a few obvious base configs like `base` and `node`, while each workspace keeps a small local `eslint.config.mjs`. In this repository, `api` and the `shared` library can simply export `eslintConfig.node`, while `client` has `eslintConfig.base` with additional rules for `react` and `vite`.
 
 ```js
 // packages/eslint-config/src/index.mjs
@@ -226,7 +226,7 @@ npx --no-install -- commitlint --edit "$1"
 }
 ```
 
-I also find custom pull request labels like `shared`, `api`, or `client` useful, because they make it easier to scan and filter pull requests before I read the files.
+I also find custom pull request labels like `shared`, `api`, or `client` useful, because they let me filter pull requests and understand what was touched before reading the files.
 
 I also simplify the versioning scheme on purpose. This repository uses one version for the root package and all workspaces. There is no need for separate versions for each package here and, accordingly, no need for a more complicated version update process.
 
@@ -269,13 +269,13 @@ This is also why I do not use `nx` here. I think it works well when a repository
 
 Once the main workflow is stable, a few smaller choices make the repository nicer to live in.
 
-One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that and show an example of it in the root `generate:package` script. The same approach works anywhere the structure repeats, for example when creating a new microservice together with its `terraform` changes. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
+One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use `plop` for that and show an example of it in the root `generate:package` script. The same approach works anywhere the structure repeats, for example when creating a new microservice together with changes to the `terraform` schema. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
 
 Another is how I work with `ai` agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. When the agent needs to work inside a nested app or library, it can automatically load the local `AGENTS.md` / `CLAUDE.md` file there. That lets me keep focused instructions close to specific parts of the repo when I need them. For a repository with multiple applications and shared packages, running the agent from the repository root feels much cleaner.
 
 ## Conclusion
 
-This approach relies on a few simple decisions that fit together well. `Npm` workspaces handle local package linking, buildless internal packages remove the rebuild treadmill, modern `node.js` keeps typescript workflows straightforward, and `turborepo` stays only where its graph awareness actually pays off.
+This approach relies on a few simple decisions that fit together well. `Npm` workspaces handle local package linking, buildless internal packages remove the endless rebuild cycle, modern `node.js` simplifies the typescript workflow, and `turborepo` stays only where it really provides a benefit.
 
 I am not presenting this repository as a perfect template that every team should copy. I am simply showing an idea and a set of tradeoffs. But if you are building a full-stack typescript system and you are tired of monorepos that feel heavier than the product itself, this is the direction I would start with.
 
