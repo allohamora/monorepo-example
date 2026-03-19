@@ -237,6 +237,24 @@ npx --no-install -- commitlint --edit "$1"
 
 Схему версіонування я теж свідомо спрощую. У цьому репозиторії використовується одна версія для root пакета і всіх workspaces, тож тут немає потреби в окремих версіях для кожного пакета чи складнішому процесі оновлення версій, а простий приклад такого release flow можна побачити в `scripts/release.ts`.
 
+```ts
+// scripts/release.ts
+const setPackageJsonVersion = async (version: string) => {
+  await $`npm version ${version} --commit-hooks false --git-tag-version false`; // root package.json
+  await $`npm version ${version} --workspaces --commit-hooks false --git-tag-version false`;
+};
+
+const updateChangelog = async () => {
+  await $`npm run update:changelog`;
+};
+
+const version = await getVersion();
+
+// other actions like create release branch, bump version in .env, make a commit, etc.
+await setPackageJsonVersion(version);
+await updateChangelog();
+```
+
 ## Де turborepo справді приносить користь
 
 У цьому setup turborepo не є обовʼязковим, але в певних місцях він справді корисний.

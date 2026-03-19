@@ -237,6 +237,24 @@ I also find custom pull request labels like `shared`, `api`, or `client` useful,
 
 I also simplify the versioning scheme on purpose. This repository uses one version for the root package and all workspaces, so there is no need for separate versions for each package or a more complicated version update process, and `scripts/release.ts` shows a simple example of that release flow.
 
+```ts
+// scripts/release.ts
+const setPackageJsonVersion = async (version: string) => {
+  await $`npm version ${version} --commit-hooks false --git-tag-version false`; // root package.json
+  await $`npm version ${version} --workspaces --commit-hooks false --git-tag-version false`;
+};
+
+const updateChangelog = async () => {
+  await $`npm run update:changelog`;
+};
+
+const version = await getVersion();
+
+// other actions like create release branch, bump version in .env, make a commit, etc.
+await setPackageJsonVersion(version);
+await updateChangelog();
+```
+
 ## Where turborepo earns its place
 
 In this setup, turborepo is not mandatory, but in some places it is really useful.
