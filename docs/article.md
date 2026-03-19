@@ -294,6 +294,47 @@ Once the main workflow is stable, a few smaller choices make the repository nice
 
 One of them is code generation. A lot of monorepo work is repetitive: create a package, add scripts, wire shared configs, fill out the basic structure, and make sure no small detail gets missed. In this repo, I use plop for that and show an example of it in the root `generate:package` script. The same approach works anywhere the structure repeats, for example when creating a new microservice together with changes to the terraform schema. It is not a core architectural piece, but it saves me from boring copy-paste mistakes.
 
+```ts
+// plopfile.ts
+export default function configurePlop(plop: NodePlopAPI): void {
+  plop.setGenerator('package', {
+    description: 'Create a package in packages',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+      },
+    ],
+    actions: () => [
+      {
+        type: 'add',
+        path: 'packages/{{name}}/package.json',
+        templateFile: 'plop-templates/package/package.json.hbs',
+      },
+      {
+        type: 'add',
+        path: 'packages/{{name}}/.prettierignore',
+        templateFile: 'plop-templates/package/.prettierignore.hbs',
+      },
+      async () => {
+        await $`npm install`;
+
+        return 'npm install';
+      },
+    ],
+  });
+}
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "generate:package": "plop package"
+  }
+}
+```
+
 Another is how I work with ai agents in the repository. In a monorepo, I prefer running the agent from the repository root. That keeps its state, permissions, and memory in one place instead of scattering them across workspaces. When the agent needs to work inside a nested app or library, it can automatically load the local `AGENTS.md` / `CLAUDE.md` file there. That lets me keep instructions close to specific parts of the repo when I need them.
 
 ## Conclusion

@@ -294,6 +294,47 @@ steps:
 
 Одне з них стосується генерації коду. У monorepo багато повторюваної роботи: створити пакет, додати scripts, під'єднати спільні configs, заповнити базову структуру і переконатися, що жодна дрібниця не загубилася. У цьому репозиторії я використовую для цього plop і показую приклад його використання у root скрипті `generate:package`. Той самий підхід працює всюди, де структура повторюється, наприклад, коли йдеться про створення нового microservice разом зі змінами схеми terraform. Це не центральна архітектурна частина, але воно рятує мене від нудних помилок через копіювання.
 
+```ts
+// plopfile.ts
+export default function configurePlop(plop: NodePlopAPI): void {
+  plop.setGenerator('package', {
+    description: 'Create a package in packages',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+      },
+    ],
+    actions: () => [
+      {
+        type: 'add',
+        path: 'packages/{{name}}/package.json',
+        templateFile: 'plop-templates/package/package.json.hbs',
+      },
+      {
+        type: 'add',
+        path: 'packages/{{name}}/.prettierignore',
+        templateFile: 'plop-templates/package/.prettierignore.hbs',
+      },
+      async () => {
+        await $`npm install`;
+
+        return 'npm install';
+      },
+    ],
+  });
+}
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "generate:package": "plop package"
+  }
+}
+```
+
 Окремо варто сказати про те, як я працюю з ai агентами у репозиторії. У monorepo я віддаю перевагу запуску агента з monorepo root. Так стан агента, дозволи і пам'ять залишаються в одному місці, а не розмазуються по різних workspaces. Коли агенту потрібно працювати всередині вкладеного застосунку чи бібліотеки, він може автоматично завантажити локальний файл `AGENTS.md` / `CLAUDE.md`. Тож я все одно можу прикріплювати інструкції до конкретних частин репозиторію, коли це потрібно.
 
 ## Висновок
