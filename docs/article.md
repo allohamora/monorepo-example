@@ -212,7 +212,7 @@ npx --no-install lint-staged
 }
 ```
 
-Conventional commits help here too, and commit scopes are especially useful. With `feat(api):` or `fix(client):`, I can see which part of the system changed before opening the diff, while a plain `feat:` usually means the change touches multiple applications or the whole repository. That makes both the history easier to read and changelog generation simpler. Conventional commits also help the `update:changelog` script with changelog generation, which is part of the release workflow in `scripts/release.ts`. It is a small convention, supported by commitlint and husky, but it pays off over time.
+Conventional commits help here too, and commit scopes are especially useful. With `feat(api):` or `fix(client):`, I can see which part of the system changed before opening the diff, while a plain `feat:` usually means the change touches multiple applications or the whole repository. That makes both the history easier to read and the changelog easier to generate through `update:changelog` in `scripts/release.ts`. It is a small convention, supported by commitlint and husky, but it pays off over time.
 
 ```bash
 # .husky/commit-msg
