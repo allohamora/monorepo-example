@@ -257,7 +257,7 @@ steps:
 }
 ```
 
-In this repository, I set `TURBO_SCM_BASE` explicitly in github actions to help turborepo find the right comparison point when using `--affected`. Those root tasks are there so affected runs can include root files, not just workspace changes.
+In this repository, I set `TURBO_SCM_BASE` explicitly in github actions to help turborepo find the right comparison point when using `--affected`, and those root tasks are there so affected runs can include root files, not just workspace changes.
 
 Docker is the other obvious example. `turbo prune` lets me build an image from only the code and dependencies the target application needs instead of pulling the whole repository into the build context. In this repo, the `Dockerfile` for `api` uses `turbo prune --scope=@example/api --docker` for exactly that reason. That is real value, not abstraction for its own sake.
 
