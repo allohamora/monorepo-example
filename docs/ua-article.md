@@ -1,0 +1,346 @@
+# Як створити зручний typescript full-stack monorepo
+
+Вітаю, мене звати Герман. Протягом багатьох років я бачив, як багато команд створюють full-stack monorepo, доводять його до робочого стану, а потім без кінця щось лагодять, додають хаки або відкладають покращення, бо ті виявляються надто складними. Після достатньої кількості такого висновок часто простий: monorepo того не вартий.
+
+Я не думаю, що проблема зазвичай у самому monorepo. Частіше проблема в його налаштуванні, яке нашвидкуруч зібрали, але так і не зробили комфортним для щоденної роботи. У цій статті я хочу показати підхід, який я використовую, щоб full-stack monorepo залишався плавним у роботі, практичним і близьким до типової розробки застосунків.
+
+Я пишу це для інженерів, яким потрібен один репозиторій для `client`, `api` та `shared` typescript коду, але які не хочуть, щоб monorepo ускладнював щоденну розробку. Як приклад я використаю власний репозиторій не як універсальний шаблон, а як конкретну демонстрацію рішень і компромісів.
+
+## Чому я обираю monorepo для full-stack розробки?
+
+Я не думаю, що кожен full-stack застосунок має жити в monorepo. Якщо `api` і `client` можуть бути повноцінно реалізовані в межах одного framework на кшталт astro або якщо ці частини майже не залежать одна від одної, monorepo може бути зайвим.
+
+Але я часто будую системи, у яких `api` і `client` тісно пов'язані, хоча при цьому мають залишатися окремими застосунками. Мені може бути потрібен окремий `api` зі своїм runtime і власним deployment. Також можуть бути потрібні websockets або job queue, які складно реалізувати в межах якогось full-stack framework. У таких випадках monorepo стає хорошою золотою серединою.
+
+Він тримає застосунки достатньо близько, щоб ділити між ними контракти та runtime код, але не змушує запаковувати все в одну структуру, продиктовану конкретним full-stack framework. У цьому репозиторії `api` побудовано на hono, а `client` - на react і vite. `Client` може імпортувати типи з `api`, щоб робити type-safe запити, а інший спільний код може існувати у `shared` бібліотеці.
+
+Альтернатива часто виявляється дорожчою, ніж здається спочатку. Щойно я розношу тісно пов'язану систему по окремих репозиторіях, мені зазвичай потрібні приватна публікація пакетів, координація версій і складніший ci. З мого досвіду це часто створює більше проблем, ніж monorepo, а не менше.
+
+## Чого я хочу від full-stack monorepo?
+
+Перш ніж обирати інструменти, я визначаю, що саме хочу отримати від monorepo, інакше надто легко гнатися за features замість того, щоб з необхідним мінімумом вирішувати практичні проблеми.
+
+Для full-stack typescript monorepo мої базові вимоги доволі прості:
+
+- Чіткі межі між застосунками, спільним runtime кодом і tooling.
+- Можливість запускати scripts з кореня репозиторію, коли це зручно, і водночас залишати кожен workspace повноцінним сам по собі.
+- Спільний код без публікації внутрішніх пакетів і без rebuild після кожної дрібної зміни.
+- Dev scripts, які природно реагують на зміни в залежностях.
+- CI, який запускає перевірки лише там, де треба.
+- Docker образи, у яких є лише те, що потрібно цільовому застосунку.
+- Git історія та конвенції ведення репозиторію, які залишаються зрозумілими для звичайних розробників застосунків.
+
+## Прості межі між workspaces
+
+Насамперед я хочу, щоб структура monorepo була зрозумілою одразу після відкриття і не потребувала пояснень. Я не хочу багато папок, чий сенс змінюється від проєкту до проєкту. Я хочу межі, які підказують, що переді мною, ще до того, як я відкрию код.
+
+Саме тому я використовую дуже простий поділ:
+
+```text
+apps/
+├── api
+└── client
+
+libs/
+└── shared
+
+packages/
+├── eslint-config
+├── prettier-config
+└── tsconfig
+```
+
+`apps/` містить застосунки, які можна запускати. `libs/` містить спільний runtime код. `packages/` містить tooling і спільну конфігурацію. Це не революційна структура, але саме тому вона мені й подобається. Вона добре масштабується, її легко сканувати очима, і вона тримає runtime код окремо від tooling задач.
+
+На рівні пакетного менеджера я теж тримаю основу максимально простою. Npm workspaces уже дають мені все, що мені тут потрібно: dependency resolution між workspaces, symlinks на внутрішні пакети через `node_modules` і запуск scripts з кореня.
+
+```json
+{
+  "name": "@example/root",
+  "private": true,
+  "workspaces": ["apps/*", "libs/*", "packages/*"]
+}
+```
+
+Я знаю, що багато команд віддають перевагу pnpm або yarn, і це чудові інструменти, але в рамках моїх вимог npm достатньо і немає сенсу додавати ще один інструмент у стек без потреби.
+
+## Buildless typescript internal packages
+
+Найважливіший вибір у цьому налаштуванні стосується того, як я працюю з внутрішніми пакетами. Багато розмов про monorepo одразу виходять із припущення, що для них спочатку треба робити build, а вже потім споживати їх як скомпільований результат. У певних середовищах це може бути правильним вибором, але за замовчуванням я цього не хочу.
+
+Для внутрішнього коду, який живе і помирає в межах одного репозиторію, я віддаю перевагу підходу, який turborepo в документації називає [just-in-time internal package](https://turborepo.dev/docs/core-concepts/internal-packages#just-in-time-packages). На практиці пакет просто вказує на typescript source код, а решта toolchain працює з ним без окремого build кроку.
+
+```json
+{
+  "name": "@example/shared",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "imports": {
+    "#src/*.ts": "./src/*.ts"
+  }
+}
+```
+
+Одне це рішення прибирає напрочуд багато інфраструктурного коду, який зазвичай з'являється в monorepo. Водночас воно забороняє використовувати typescript aliases, бо для них уже потрібен build крок.
+
+Якби я захотів aliases для внутрішніх пакетів, мені довелося б додати build у `dist/`, потім post build rewrite через щось на кшталт tsc-alias, а ще окремо підтримувати watch для rebuilds. З `turbo watch` це означало б або зайві рестарти dev process, або паралельний цикл rebuild залежностей на кожній зміні. Якщо ж потрібна тонша поведінка, де перебудовуються лише monorepo залежності, а локальні зміни далі обробляє watcher самого застосунку, доводиться йти далі. Зазвичай це закінчується custom watch script поверх чогось на кшталт turbowatch і навіть окремим внутрішнім scripts package.
+
+Проблема часто не обмежується лише рантаймом. Після кількох rebuilds сервер typescript у редакторі інколи перестає коректно синхронізуватися, тож доводиться або перезапускати його вручну, або костилити setup `references` без `composite`, щоб ide не відставала від актуального стану. Такий компроміс може бути виправданим, якщо пакет треба публікувати або toolchain справді вимагає скомпільований результат, але без реальної потреби я б цього не робив.
+
+## Чому розробка залишається плавною?
+
+Рішення з пакетами без окремого build працює, тому що вибір runtime і tooling його підтримує, а не бореться з ним.
+
+Цей репозиторій орієнтується на сучасний node.js з erasable syntax і спирається на прямий запуск typescript entrypoints. Пакет `api` використовує `node src/index.ts` для старту і `node --watch src/index.ts` для розробки. `Shared` бібліотека теж працює напряму з вихідним кодом. Тому я можу змінити код у `@example/shared`, а звичайний tooling підхоплює цю зміну без окремого циклу rebuild пакета, перезапуску застосунку й оновлення стану редактора.
+
+Конфігурація typescript тут навмисно підігнана під цю модель:
+
+```json
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "erasableSyntaxOnly": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "module": "NodeNext",
+    "noEmit": true
+  }
+}
+```
+
+Це важливо не лише для `api`. Vite та vitest на боці `client` теж можуть працювати з внутрішніми пакетами напряму, тож мені не потрібен додатковий monorepo orchestration поверх звичайного workflow.
+
+Тут і проявляється перевага імпорту типів з `api`, про яку я згадував:
+
+```ts
+// apps/api/src/app.ts
+export const app = new Hono().get('/ping', (c) => c.text(ping()));
+export type App = typeof app;
+
+// apps/client/src/api.ts
+import { type App } from '@example/api/app';
+import { hc } from 'hono/client';
+
+const api = hc<App>('http://localhost:3000');
+
+// somewhere in the client code
+const res = await api.ping.$get();
+console.log(await res.text());
+```
+
+Якщо я зламаю серверний контракт несумісною зміною, `client` може впасти на етапі перевірки типів замість того, щоб ця невідповідність дожила до runtime. Коли щось не можна або не варто експортувати прямо із серверного пакета, я виношу це в `shared` бібліотеку, і контракт між застосунками залишається поруч із кодом, який його використовує.
+
+## Конвенції, які роблять щоденну роботу плавнішою
+
+Я тримаю спільні конфіги для eslint, prettier і typescript у `packages/eslint-config`, `packages/prettier-config` і `packages/tsconfig` та ставлюся до них як до звичайних пакетів workspaces.
+
+Для спільного prettier: кожен workspace додає `@example/prettier-config` і вказує на нього у своєму полі `prettier` у `package.json`. `.prettierignore` неможливо поділити таким самим способом, тому доводиться його дублювати у кожному workspace та в root.
+
+```json5
+// packages/prettier-config/src/index.json
+{
+  "semi": true,
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 120
+}
+
+// apps/api/package.json
+{
+  "devDependencies": {
+    "@example/prettier-config": "*"
+  },
+  "prettier": "@example/prettier-config"
+}
+```
+
+Для eslint я зазвичай хочу, щоб спільний пакет віддавав кілька очевидних базових конфігів на кшталт `base`, `node`, а кожен workspace при цьому тримав невеликий локальний `eslint.config.mjs`. У цьому репозиторії `api` і `shared` бібліотека можуть просто експортувати `eslintConfig.node`, а `client` містить `eslintConfig.base` з додатковими правилами для react і vite.
+
+```js
+// packages/eslint-config/src/index.mjs
+export const base = defineConfig(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginPrettierRecommended,
+);
+
+// apps/client/eslint.config.mjs
+export default defineConfig([...eslintConfig.base, reactHooks.configs.flat.recommended, reactRefresh.configs.vite]);
+```
+
+Для typescript логіка та сама, але форма пакета простіша. Спільний `tsconfig` пакет зазвичай просто тримає файли на кшталт `node.json` у корені пакета, а потім кожен workspace розширює те, що йому потрібно. У цьому репозиторії `api` і `shared` бібліотека розширюють `@example/tsconfig/node.json`, а `client` тримає власні `tsconfig` файли, орієнтовані на vite, бо vite має свої обмеження.
+
+```json5
+// packages/tsconfig/node.json
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "module": "NodeNext",
+    "noEmit": true
+  }
+}
+
+// apps/api/tsconfig.json
+{
+  "extends": "@example/tsconfig/node.json"
+}
+```
+
+Схожу логіку я застосовую і в роботі з commits. Husky і lint-staged проганяють виправлення перед commit, а найближчий конфіг обробляє staged files, тож у root діє свій набір перевірок, а застосунки й бібліотеки мають власні локальні налаштування. При цьому `apps`, `packages` і `libs` ігноруються для root перевірок, щоб форматування, лінтинг і перевірка типів у root були сфокусовані на файлах, розміщених у root.
+
+```bash
+# .husky/pre-commit
+npx --no-install lint-staged
+```
+
+```json5
+// package.json
+"lint-staged": {
+  "*.{js,cjs,mjs,json,yml,md}": "prettier --write",
+  "*.ts": "eslint --fix"
+}
+
+// apps/client/package.json
+"lint-staged": {
+  "*.{js,cjs,mjs,json,yml,md,html,css}": "prettier --write",
+  "*.{ts,tsx}": "eslint --fix"
+}
+```
+
+Тут також допомагають conventional commits, у яких особливо корисними є commit scopes. Наприклад, з `feat(api):` або `fix(client):` я ще до відкриття diff бачу, яка саме частина системи змінилася, тоді як звичайний `feat:` зазвичай означає, що зміна зачіпає кілька застосунків або весь репозиторій. Це спрощує і читання історії, і генерацію changelog через conventional-changelog. Це невелика конвенція, яку підтримують commitlint і husky, але з часом вона добре окупається.
+
+```bash
+# .husky/commit-msg
+npx --no-install -- commitlint --edit "$1"
+```
+
+```json
+// .commitlintrc.json
+{
+  "extends": ["@commitlint/config-conventional"]
+}
+```
+
+```json
+// package.json
+"scripts": {
+  "update:changelog": "conventional-changelog -p conventionalcommits"
+}
+```
+
+Також мені подобаються custom теги для pull request на кшталт `shared`, `api` або `client`, бо вони дозволяють фільтрувати pull requests й розуміти, що саме було зачеплено, ще до читання файлів.
+
+Схему версіонування я теж свідомо спрощую. У цьому репозиторії використовується одна версія для root пакета і всіх workspaces, тож тут немає потреби в окремих версіях для кожного пакета чи складнішому процесі оновлення версій, а простий приклад такого release flow можна побачити в `scripts/release.ts`.
+
+```ts
+// scripts/release.ts
+const setPackageJsonVersion = async (version: string) => {
+  await $`npm version ${version} --commit-hooks false --git-tag-version false`; // root package.json
+  await $`npm version ${version} --workspaces --commit-hooks false --git-tag-version false`;
+};
+
+const updateChangelog = async () => {
+  await $`npm run update:changelog`;
+};
+
+const version = await getVersion();
+
+// other actions like create release branch, bump version in .env, make a commit, etc.
+await setPackageJsonVersion(version);
+await updateChangelog();
+```
+
+## Де turborepo справді приносить користь
+
+У цьому setup turborepo не є обовʼязковим, але в певних місцях він справді корисний.
+
+Найкраще це видно на affected ci. Я хочу, щоб репозиторій розумів зв'язки між пакетами і запускав перевірки лише там, де зміна справді має значення, а turborepo вже досить добре вміє це робити.
+
+```yaml
+# .github/workflows/affected.yml
+env:
+  # https://github.com/vercel/turborepo/issues/9320
+  TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+
+steps:
+  - run: npx turbo run format --affected
+  - run: npx turbo run lint --affected
+  - run: npx turbo run typecheck --affected
+  - run: npx turbo run test --affected
+```
+
+```json5
+// turbo.json
+"//#format": {
+  "cache": false,
+  "inputs": ["$TURBO_DEFAULT$", "!apps/**", "!libs/**", "!packages/**"]
+}
+```
+
+У цьому прикладі я явно задаю `TURBO_SCM_BASE` у github actions, щоб допомогти turborepo знайти правильну ціль під час використання `--affected`, а root tasks у `turbo.json` потрібні для того, щоб у такі запуски потрапляли ще й файли з root, а не лише зміни у workspaces.
+
+Іншим очевидним прикладом є docker. `turbo prune` дозволяє мені будувати образ лише з коду і залежностей, які потрібні цільовому застосунку, замість того, щоб тягнути весь репозиторій у контекст збірки. У цьому репозиторії `Dockerfile` для `api` використовує `turbo prune --scope=@example/api --docker` саме з цієї причини. Це реальна цінність, а не просто абстракція заради самої абстракції.
+
+Саме тому я тут не використовую nx. Я вважаю, що він добре працює, коли репозиторій залишається всередині його моделі, але разом із цим приходить більше абстракції і більше магії.
+
+## Додаткові речі, які роблять життя приємнішим
+
+Коли основний workflow вже стабільний, кілька менших рішень справді роблять життя з цим репозиторієм приємнішим.
+
+Одне з них стосується генерації коду. У monorepo багато повторюваної роботи: створити пакет, додати scripts, під'єднати спільні конфіги, заповнити базову структуру і переконатися, що жодна дрібниця не загубилася. У цьому репозиторії я використовую для цього plop і показую приклад його використання у root скрипті `generate:package`. Той самий підхід працює всюди, де структура повторюється, наприклад, коли йдеться про створення нового microservice разом зі змінами схеми terraform. Це не центральна архітектурна частина, але воно рятує мене від нудних помилок через копіювання.
+
+```ts
+// plopfile.ts
+export default function configurePlop(plop: NodePlopAPI): void {
+  plop.setGenerator('package', {
+    description: 'Create a package in packages',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+      },
+    ],
+    actions: () => [
+      {
+        type: 'add',
+        path: 'packages/{{name}}/package.json',
+        templateFile: 'plop-templates/package/package.json.hbs',
+      },
+      {
+        type: 'add',
+        path: 'packages/{{name}}/.prettierignore',
+        templateFile: 'plop-templates/package/.prettierignore.hbs',
+      },
+      async () => {
+        await $`npm install`;
+
+        return 'npm install';
+      },
+    ],
+  });
+}
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "generate:package": "plop package"
+  }
+}
+```
+
+Окремо варто сказати про те, як я працюю з ai агентами у репозиторії. У monorepo я віддаю перевагу запуску агента з monorepo root. Так стан агента, дозволи і пам'ять залишаються в одному місці, а не розмазуються по різних workspaces. Коли агенту потрібно працювати всередині вкладеного застосунку чи бібліотеки, він може автоматично завантажити локальний файл `AGENTS.md` / `CLAUDE.md`. Тож я все одно можу прикріплювати інструкції до конкретних частин репозиторію, коли це потрібно.
+
+## Висновок
+
+Цей підхід тримається на кількох простих рішеннях, які добре поєднуються між собою. Npm workspaces відповідають за локальне зв'язування пакетів, внутрішні пакети без окремого build прибирають нескінченний цикл rebuilds, сучасний node.js спрощує typescript workflow, а turborepo лишається лише там, де справді дає виграш.
+
+Я не подаю цей репозиторій як ідеальний шаблон, який має копіювати кожна команда. Я просто показую ідею та набір компромісів. Але якщо ви будуєте full-stack typescript проєкт і втомилися від monorepo, який здається важчим за сам продукт, то саме з цього напрямку я б починав.
+
+Репозиторій: [https://github.com/allohamora/monorepo-example](https://github.com/allohamora/monorepo-example)
