@@ -1,10 +1,10 @@
-FROM node:24.13.0-alpine AS builder
+FROM node:24.14.1-alpine AS builder
 
 WORKDIR /app
 COPY . .
 RUN npx turbo prune --scope=@example/api --docker
 
-FROM node:24.13.0-alpine AS runner
+FROM node:24.14.1-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
